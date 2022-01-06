@@ -14,3 +14,5 @@ pip install -r requirements.txt
 python main.py
 ```
  or just double click it
+
+ **NOT RUNNABLE IN THIS STATE -- NOT FINISHED**
