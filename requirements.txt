@@ -1,0 +1,2 @@
+###### Requirements - tested for listed versions but should work even with newer versions
+pygame 	>= 2.0.1     
