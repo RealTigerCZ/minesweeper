@@ -3,6 +3,9 @@
 
 ## Format:
 *bomb_tile.png* -> 16x16 px
+
 *bomb_tile_red.png* -> 16x16 px
+
 *flag_tile.png* -> 512x512
+
 *uncovered_tile.png* -> 512x512
