@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Tuple
 import pygame, sys, os
 
 class Tile:
@@ -21,14 +22,57 @@ class Tile:
 
 
 @dataclass
-class Textures:
-    path: str
-    extension: str = "png"
+class Texture:
+    def __init__(self, name: str, ext: str, size: Tuple[int,int], path: os.path):
+        self.name = name
+        self.name_with_ext = name + "." + ext
+        self.path = os.path.join(path, self.name_with_ext)
+        self.size = size
+        self.image = None
 
-    bomb_tile: str = "bomb_tile"
-    bomb_tile_red: str = "bomb_tile_red"
-    flag_tile: str = "flag_tile"
-    uncovered_tile: str = "uncovered_tile"
+
+@dataclass
+class Textures:
+    def __init__(self, path: str):
+        self.path = path
+
+        #textures
+        self.bomb_tile      = Texture("bomb_tile",      "png", (15, 15),    path) 
+        self.bomb_tile_red  = Texture("bomb_tile_red",  "png", (15, 15),    path)
+        self.flag_tile      = Texture("flag_tile",      "png", (512, 512),  path)
+        self.uncovered_tile = Texture("uncovered_tile", "png", (512, 512),  path)
+
+        #states
+        self.loaded = False
+
+
+    def __load_texture(self, texture: Texture):
+        try:
+            texture.image = pygame.image.load(texture.path)
+        
+        except pygame.error as message:
+            print("Cannot load texture:", texture.name_with_ext)
+            raise SystemExit(message)
+        
+        except FileNotFoundError as message:
+            print("Cannot find texture:", texture.name_with_ext)
+            raise SystemExit(message, f"Path: {texture.path}")
+    
+        if texture.image.get_size() != texture.size:
+            raise SystemExit(f"Texture {texture.name_with_ext} cannot be loaded, because it has unexpexted size!\nExpected: {texture.size}, actual: {texture.image.get_size()}\n")
+
+
+    def load_textures(self):
+        self.__load_texture(self.bomb_tile)
+        self.__load_texture(self.bomb_tile_red)
+        self.__load_texture(self.flag_tile)
+        self.__load_texture(self.uncovered_tile)
+
+        self.loaded = True
+    
+        
+        
+     
 
 
 @dataclass
@@ -39,6 +83,10 @@ class Glo:
     bombsCount: int
     textures: Textures
     board: list[list[Tile]] = field(default_factory=list)
+
+
+glo = Glo(1, 1, 1, 1, Textures(os.path.join(os.path.dirname(__file__), "../textures")))
+glo.textures.load_textures()
 
 run = True
 screen = pygame.display.set_mode((350, 250), pygame.RESIZABLE)
