@@ -1,24 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Tuple
-import pygame, sys, os
-
-class Tile:
-    def __init__(self, x, y):
-        self.__x = x
-        self.__y = y
-        self.hasBomb = False
-        self.bombMembersCount = None
-
-    def find_neighbours(self):
-        dirs = [(1,0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
-        for dir in dirs:
-            x = dir[0] + self.__x
-            y = dir[1] + self.__y
-            if x < glo.sizeX and x >= 0 and y < glo.SizeY and y >= 0:
-                self.neighbours.append(glo.board[y][x])
-
-    def render(self, screen):
-        pass
+import pygame, sys, os, random
 
 
 @dataclass
@@ -72,30 +54,98 @@ class Textures:
     
         
         
-     
+
+class Game:
+    def __init__(self, sizeX: int, sizeY: int, bombsCount: int, textures: Textures):
+        self.sizeX = sizeX
+        self.sizeY = sizeY
+        self.sizeTile = None
+        self.bombsCount = bombsCount
+        self.textures = textures
+        self.board = []
+
+        self.__check()
+        self.__create_board()
+    
+    def __check(self):
+        if self.sizeX <= 0:
+            raise SystemExit(f"Cannot have board with sizeX less or equal to 0! Inputed value: {self.sizeX}")
+        if self.sizeY <= 0:
+            raise SystemExit(f"Cannot have board with sizeY less or equal to 0! Inputed value: {self.sizeY}")
+        if self.bombsCount >= self.sizeX * self.sizeY:
+            raise SystemExit(f"Cannot have that much bombs! (Cant be equal to size of board or even bigger) Bombs count: {self.bombsCount}, size of borad: {self.sizeX * self.sizeY}")
+   
+    def __create_board(self):
+        self.board = [[self.Tile(x, y) for x in range(self.sizeX)] for y in range(self.sizeY)]
+        i = 0
+        while i < self.bombsCount:
+            x = random.randint(0, self.sizeX - 1)
+            y = random.randint(0, self.sizeY - 1)
+            tile = self.board[y][x]
+            if not tile.hasBomb:
+                tile.hasBomb = True
+                i +=1
+
+        for line in self.board:
+            for tile in line:
+                tile.find_neighbours(self)
+                tile.count_bombs()
 
 
-@dataclass
-class Glo:
-    sizeX: int
-    sizeY: int
-    sizeTile: int
-    bombsCount: int
-    textures: Textures
-    board: list[list[Tile]] = field(default_factory=list)
+    class Tile:
+        def __init__(self, x: int, y: int):
+            self.x = x
+            self.y = y
+            self.hasBomb = False
+            self.bombNeighboursCount = None
+            self.neighbours = []
+   
+
+        def find_neighbours(self, game):
+            dirs = [(1,0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
+            for dir in dirs:
+                x = dir[0] + self.x
+                y = dir[1] + self.y
+                if x < game.sizeX and x >= 0 and y < game.sizeY and y >= 0:
+                    self.neighbours.append(game.board[y][x])
+
+        def count_bombs(self):
+            self.bombNeighboursCount = 0
+            for n in self.neighbours:
+                if n.hasBomb:
+                    self.bombNeighboursCount += 1
 
 
-glo = Glo(1, 1, 1, 1, Textures(os.path.join(os.path.dirname(__file__), "../textures")))
-glo.textures.load_textures()
+        def render(self, screen):
+            pass
 
+
+#TESTING
+
+game = Game(5, 6, 7, Textures(os.path.join(os.path.dirname(__file__), "../textures")))
+game.textures.load_textures()
+#print(game.board)
+
+for line in game.board:    
+    for item in line:
+        print((item.x, item.y), end = " ")
+    print()
+for line in game.board:    
+    for item in line:
+        print("X" if item.hasBomb else item.bombNeighboursCount, end = " ")
+    print()
 run = True
 screen = pygame.display.set_mode((350, 250), pygame.RESIZABLE)
 clock = pygame.time.Clock()
+
+
+
+
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
     screen.fill((0,255,255))
-    clock.tick(20)
-    print(screen.get_width(), screen.get_height())
+    clock.tick(10)
+    #print(screen.get_width(), screen.get_height())
     pygame.display.flip()
