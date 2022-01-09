@@ -2,6 +2,7 @@
 - in corners grid lines sometimes are not rendered to the absolute end
 - grid lines are not positioned perfectly -> tiles are not rendered in
 the middle
+- it ignores the flag -> its only visual indicator
 
 ## Features:
 - it should work on Windows 10 64-bit with Python 3.9.5 (maybe i newer) and [requirements](https://github.com/RealTigerCZ/minesweeper/blob/master/requirements.txt)

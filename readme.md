@@ -17,7 +17,7 @@ python main.py
 
  - it uses "Comic Sans MS" font so you need to have it installed or change it in code
 
- **'RUNNABLE' with very bugs and almost no features**
+ **'RUNNABLE' with many bugs and almost no features**
  **Read [about.md](https://github.com/RealTigerCZ/minesweeper/blob/master/about.md)**
 
  ## Goals:

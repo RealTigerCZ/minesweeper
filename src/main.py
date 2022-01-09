@@ -1,9 +1,7 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Tuple
-import pygame, sys, os, random
+import pygame, os, random
 
-
-# not used: sys, field!
 
 @dataclass
 class Colors:
@@ -83,7 +81,6 @@ class Game:
 
         self.__check()
         self.board.create_board()
-
 
 
     def __check(self):
@@ -274,7 +271,7 @@ class Game:
 
 # TESTING
 
-game = Game((16, 8), 16*4, Textures(os.path.join(os.path.dirname(__file__), "../textures")))
+game = Game((16, 8), 16, Textures(os.path.join(os.path.dirname(__file__), "../textures")))
 game.textures.load_textures()
 # print(game.board)
 
@@ -302,6 +299,7 @@ clock = pygame.time.Clock()
 
 colors = Colors()
 
+pygame.display.set_caption("Very bad minesweeper")
 
 while run:
     for event in pygame.event.get():
@@ -320,7 +318,3 @@ while run:
     game.board.render(screen, colors)
     #print(screen.get_width(), screen.get_height())
     pygame.display.flip()
-
-
-#TODO FONT
-#TODO Texture test
