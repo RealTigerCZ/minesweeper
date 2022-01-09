@@ -21,9 +21,9 @@ python main.py
  **Read [about.md](https://github.com/RealTigerCZ/minesweeper/blob/master/about.md)**
 
  ## Goals:
- [] Gameplay - so you can win and lose
- [] Restart button
- [] Displays - missing bombs, timer, ...
- [] Menu and 'Welcome screen'
- [] Settings
+ - [ ] Gameplay - so you can win and lose
+ - [ ] Restart button
+ - [ ] Displays - missing bombs, timer, ...
+ - [ ] Menu and 'Welcome screen'
+ - [ ] Settings
 
