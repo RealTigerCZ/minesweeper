@@ -4,14 +4,15 @@ import pygame, sys, os, random
 
 
 # not used: sys, field!
+
 @dataclass
 class Colors:
     """Global color settings (RGB)"""
-
-    grid_color      = (200, 200, 200)
-    grid_line_color = (0, 0, 0)
-    bombsCount = [(0, 0, 0) for _ in range(10)]
-
+    
+    background      = (200, 200, 200)
+    grid_line_color = (50, 50, 50)
+    bombsCount = [(0, 0, 255), (0, 128, 0), (255, 0, 0), (0, 0, 128), (128, 0, 0), (0, 128, 128), (128, 128, 128), (0, 0, 0)]
+    #TODO colors
 
 
 @dataclass
@@ -76,7 +77,7 @@ class Textures:
 class Game:
     def __init__(self, sizeOfBoard: Tuple[int, int], bombsCount: int, textures: Textures):
         self.textures = textures
-        self.board = self.Board(sizeOfBoard[0], sizeOfBoard[1], bombsCount, self)
+        self.board = self.Board(sizeOfBoard, bombsCount, self)
         self.colors = Colors()
 
 
@@ -100,18 +101,20 @@ class Game:
     def __set_for_render(self, screen):
         self.w = screen.get_width()
         self.h = screen.get_height()
+        #TODO render
 
     def render(self, screen):
         pass
+        #TODO render
 
     class Board:
         """Subclass of class 'Game', is used to represent board"""
 
-        def __init__(self,  sizeX: int, sizeY: int, bombsCount: int, game):
-            self.sizeX = sizeX
-            self.sizeY = sizeY
+        def __init__(self,  size, bombsCount: int, game):
+            self.sizeX = size[0]
+            self.sizeY = size[1]
             self.bombsCount = bombsCount
-            self.game = game
+            self.game = game #refernce to game
             self.sizeTile = None
             self.padding = None
             self.board = []
@@ -147,13 +150,12 @@ class Game:
                 pygame.draw.line(screen, colors.grid_line_color, start_pos, end_pos, width = self.padding[0])
 
         def __render_board(self, screen):
-            if 1:
-                for line in self.board:
-                    for tile in line:
-                        tile.render(screen, self.padding, self.sizeTile)
+            for line in self.board:
+                for tile in line:
+                    tile.render(screen, self.padding, self.sizeTile)
 
         def render(self, screen, colors: Colors):
-            self.font = pygame.font.SysFont("comicsans", round(self.sizeTile * 0.8))
+            self.font = pygame.font.SysFont("Comic Sans MS", round(self.sizeTile * 0.8))
             self.__render_grid(screen, colors)
             self.__render_board(screen)
         
@@ -176,11 +178,11 @@ class Game:
             return False
 
         def handle_click(self, pos: Tuple[int, int], pressed: Tuple[int, int, int]):
-            if pressed[0] or pressed[1]:
+            if pressed[0] or pressed[2]:
                 if self.__pos_in_on_board(pos):
                     x = (pos[0] - self.padding[0]) // self.sizeTile
                     y = (pos[1] - self.padding[1]) // self.sizeTile
-                    self.board[y][x].click(True)
+                    self.board[y][x].user_click(pressed)
 
         class Tile:
             """Subclass of class 'Board', is used to represent one tile"""
@@ -235,25 +237,31 @@ class Game:
                         self.__render_texture(screen, self.game.textures.bomb_tile, x, y, size)
                 
                 elif self.bombNeighboursCount > 0:
-                    surf = self.game.board.font.render(str(self.bombNeighboursCount), False ,self.game.colors.bombsCount[self.bombNeighboursCount - 1])
+                    surf = self.game.board.font.render(str(self.bombNeighboursCount), True ,self.game.colors.bombsCount[self.bombNeighboursCount - 1])
                     rect = surf.get_rect()
                     rect.center = (x + size //2, y + size//2)
                     screen.blit(surf, rect)
 
 
-            def click(self, user: bool = False):
+            def user_click(self, pressed):
+                if pressed[0]:
+                    self.clicked = True
+                    if self.hasBomb:
+                        for line in self.game.board.board:
+                            for tile in line:
+                                tile.uncovered = True
+                    self.click()
+                
+                if pressed[2]:
+                    self.flag = not self.flag
+                    
+                    
+            def click(self):
                 self.uncovered = True
-                self.clicked = user
-                if user and self.hasBomb:
-                    for line in self.game.board.board:
-                        for tile in line:
-                            tile.uncovered = True
-               
-                elif self.bombNeighboursCount == 0:
+                if self.bombNeighboursCount == 0:
                     for n in self.neighbours:
                         if not n.uncovered:
                             n.click()
-
                  
             def __render_texture(self, screen, texture: Texture, x: int, y: int, size: int):
                 image = pygame.transform.scale(texture.image, (size, size))
@@ -266,7 +274,7 @@ class Game:
 
 # TESTING
 
-game = Game((16, 8), 7, Textures(os.path.join(os.path.dirname(__file__), "../textures")))
+game = Game((16, 8), 16*4, Textures(os.path.join(os.path.dirname(__file__), "../textures")))
 game.textures.load_textures()
 # print(game.board)
 
@@ -307,8 +315,12 @@ while run:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             game.board.handle_click(pygame.mouse.get_pos(), pygame.mouse.get_pressed())
 
-    screen.fill((0, 255, 255))
+    screen.fill(game.colors.background)
     clock.tick(10)
     game.board.render(screen, colors)
     #print(screen.get_width(), screen.get_height())
     pygame.display.flip()
+
+
+#TODO FONT
+#TODO Texture test

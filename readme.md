@@ -15,4 +15,15 @@ python main.py
 ```
  or just double click it
 
- **NOT RUNNABLE IN THIS STATE -- NOT FINISHED**
+ - it uses "Comic Sans MS" font so you need to have it installed or change it in code
+
+ **'RUNNABLE' with very bugs and almost no features**
+ **Read [about.md](https://github.com/RealTigerCZ/minesweeper/blob/master/about.md)**
+
+ ## Goals:
+ [] Gameplay - so you can win and lose
+ [] Restart button
+ [] Displays - missing bombs, timer, ...
+ [] Menu and 'Welcome screen'
+ [] Settings
+
