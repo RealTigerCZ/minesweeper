@@ -3,7 +3,7 @@ from game import *
 
 # TESTING
 
-game = Game((16, 8), 2)
+game = Game((16, 8), 5)
 # print(game.board)
 
 pygame.init()
@@ -55,6 +55,7 @@ while run:
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_r:
                 game.reset()
+                frame = 0
     if game.win:
         screen.fill(colors.win_colors[frame//60 % 2])
     elif game.lose:
@@ -63,6 +64,5 @@ while run:
         screen.fill(colors.background)
     clock.tick(60)
     game.board.render(screen)
-    #print(screen.get_width(), screen.get_height())
     frame += 1
     pygame.display.flip()

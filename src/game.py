@@ -245,6 +245,8 @@ class Game:
             def user_click(self, button: int, down: bool):
                 """Handles user click send by board"""
                 if button == 1:
+                    if self.flag:
+                        return
                     if down:
                         self.pressed = True
                         self.press_num()
