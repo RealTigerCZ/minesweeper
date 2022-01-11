@@ -3,7 +3,7 @@ from game import *
 
 # TESTING
 
-game = Game((16, 8), 1)
+game = Game((16, 8), 16)
 # print(game.board)
 
 pygame.init()
