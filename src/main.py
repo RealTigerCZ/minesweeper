@@ -2,6 +2,7 @@ from game import *
 
 
 # TESTING
+
 game = Game((16, 8), 16)
 # print(game.board)
 
@@ -33,6 +34,8 @@ clock = pygame.time.Clock()
 
 pygame.display.set_caption("Very bad minesweeper")
 
+
+
 while run:
     for event in pygame.event.get():
         #print(event)
@@ -49,6 +52,9 @@ while run:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             game.board.handle_click(event.pos, event.button, True)
 
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_r:
+                game.reset_board()
     screen.fill(colors.background)
     clock.tick(60)
     game.board.render(screen)

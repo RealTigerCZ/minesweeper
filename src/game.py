@@ -32,6 +32,17 @@ class Game:
         self.h = screen.get_height()
         #TODO render
 
+    def reset_board(self):
+        size = (self.board.sizeX, self.board.sizeY)
+        bombs = self.board.bombsCount
+        padding = self.board.padding
+        size_tile = self.board.sizeTile
+
+        self.board = self.Board(size, bombs, self)
+        self.board.create_board()
+        self.board.padding = padding
+        self.board.sizeTile = size_tile
+
     def render(self, screen):
         pass
         #TODO render
