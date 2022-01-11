@@ -8,6 +8,7 @@ the middle
     - if you press covered tile -> texture will change
     - if you press uncovered tile -> texture of covered neighbours will change
     - if you press one tile and slide to another -> click will be canceled
+    - if you left click on tile with flag -> click will be canceled
 
 - **Advanced clicking controls:**
     - left clicking on uncovered tile with number, uncoveres all their neighbours if you mark same number of bombs as are on number
