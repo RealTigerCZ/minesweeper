@@ -47,6 +47,8 @@ class Game:
             self.padding = None
             self.board = []
 
+            self.__lastHandledClicks = None
+
              
         def create_board(self):
             """Internal method of class Game which initialize board and all their Tiles"""
@@ -105,12 +107,31 @@ class Game:
                     return True
             return False
 
-        def handle_click(self, pos: Tuple[int, int], pressed: Tuple[int, int, int]):
-            if pressed[0] or pressed[2]:
+        def handle_click(self, pos: Tuple[int, int], button: int, down: bool):
+            if button in [1, 3]:
                 if self.__pos_in_on_board(pos):
                     x = (pos[0] - self.padding[0]) // self.sizeTile
                     y = (pos[1] - self.padding[1]) // self.sizeTile
-                    self.board[y][x].user_click(pressed)
+                    
+                    if self.__allow_click(x, y, down):
+                        self.board[y][x].user_click(button, down)
+
+
+        def __allow_click(self, x, y, down):
+            if down:
+                self.__lastHandledClicks = (x, y)
+                return True
+            else:
+                if self.__lastHandledClicks:
+                    lx, ly = self.__lastHandledClicks
+                    self.__lastHandledClicks = None
+                    if x == lx and y == ly:
+                        return True
+                    else:
+                        self.board[ly][lx].unpress()
+
+
+            return False
 
         class Tile:
             """Subclass of class 'Board', is used to represent one tile"""
@@ -125,7 +146,7 @@ class Game:
 
                 self.clicked = False
                 self.flag = False
-                self.touching = False
+                self.pressed = False
                 self.uncovered = False
 
             def find_neighbours(self):
@@ -152,8 +173,8 @@ class Game:
                     self.__render_uncovered(screen, x, y, size)
                 elif self.flag:
                     self.__render_texture(screen, textures.flag_tile, x, y, size)
-                elif self.touching:
-                    self.__render_texture(screen, textures.touching_tile, x, y, size)            
+                elif self.pressed:
+                    self.__render_texture(screen, textures.pressed_tile, x, y, size)            
                 else:
                     self.__render_texture(screen, textures.uncovered_tile, x, y, size)
                     
@@ -171,25 +192,74 @@ class Game:
                     screen.blit(surf, rect)
 
 
-            def user_click(self, pressed):
-                if pressed[0]:
-                    self.clicked = True
-                    if self.hasBomb:
-                        for line in self.game.board.board:
-                            for tile in line:
-                                tile.uncovered = True
-                    self.click()
+            def user_click(self, button: int, down: bool):
+                if button == 1:
+                    if down:
+                        self.pressed = True
+                        self.press_num()
+                    else:
+                        self.unpress()
+                        self.clicked = True
+                        if self.hasBomb:
+                            for line in self.game.board.board:
+                                for tile in line:
+                                    tile.uncovered = True
+                        self.click()
                 
-                if pressed[2]:
-                    self.flag = not self.flag
+                elif button == 3:
+                    if not down:
+                        if self.uncovered:
+                            self.__flag_neighbours()
+     
+                        else:
+                            self.flag = not self.flag
                     
                     
             def click(self):
+                self.uncover_neighbours()
+                with_flag = self.__countNeighboursWithFlag()
+                if with_flag == self.bombNeighboursCount:
+                    for n in self.neighbours:
+                        if not n.flag:
+                            n.uncover_neighbours()
+    
+            
+            def uncover_neighbours(self):
                 self.uncovered = True
                 if self.bombNeighboursCount == 0:
                     for n in self.neighbours:
                         if not n.uncovered:
                             n.click()
+                self.unpress()
+            
+            def press_num(self):
+                if self.uncovered:
+                    for n in self.neighbours:
+                        if not n.uncovered:
+                            n.pressed = True
+
+            def unpress(self):
+                self.pressed = False
+                for n in self.neighbours:
+                    n.pressed = False
+
+            def __countNeighboursWithFlag(self):
+                suma = 0
+                for n in self.neighbours:
+                    suma += n.flag
+                return suma
+
+            def __flag_neighbours(self):
+                covered_without_flag = 0
+                for n in self.neighbours:
+                    covered_without_flag += not (n.uncovered or n.flag)
+
+                if covered_without_flag > 0:
+                    with_flag = self.__countNeighboursWithFlag()
+                    if covered_without_flag + with_flag == self.bombNeighboursCount:
+                        for n in self.neighbours:
+                            if not n.uncovered:
+                                n.flag = True   
                  
             def __render_texture(self, screen, texture: Texture, x: int, y: int, size: int):
                 image = pygame.transform.scale(texture.image, (size, size))
