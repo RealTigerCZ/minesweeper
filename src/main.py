@@ -3,7 +3,7 @@ from game import *
 
 # TESTING
 
-game = Game((16, 8), 16)
+game = Game((16, 8), 2)
 # print(game.board)
 
 pygame.init()
@@ -35,7 +35,7 @@ clock = pygame.time.Clock()
 pygame.display.set_caption("Very bad minesweeper")
 
 
-
+frame = 0
 while run:
     for event in pygame.event.get():
         #print(event)
@@ -54,9 +54,15 @@ while run:
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_r:
-                game.reset_board()
-    screen.fill(colors.background)
+                game.reset()
+    if game.win:
+        screen.fill(colors.win_colors[frame//60 % 2])
+    elif game.lose:
+        screen.fill(colors.lose_colors[frame//60 % 2])
+    else:
+        screen.fill(colors.background)
     clock.tick(60)
     game.board.render(screen)
     #print(screen.get_width(), screen.get_height())
+    frame += 1
     pygame.display.flip()

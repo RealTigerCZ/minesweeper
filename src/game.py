@@ -14,6 +14,8 @@ class Game:
         self.__check()
         self.board.create_board()
 
+        self.win = False
+        self.lose = False        
 
     def __check(self):
         """Internal method of class Game which checks internal values like sizeX, sizeY, bombCount"""
@@ -32,7 +34,7 @@ class Game:
         self.h = screen.get_height()
         #TODO render
 
-    def reset_board(self):
+    def reset(self):
         size = (self.board.sizeX, self.board.sizeY)
         bombs = self.board.bombsCount
         padding = self.board.padding
@@ -42,6 +44,9 @@ class Game:
         self.board.create_board()
         self.board.padding = padding
         self.board.sizeTile = size_tile
+
+        self.win = False
+        self.lose = False
 
     def render(self, screen):
         pass
@@ -137,6 +142,7 @@ class Game:
                     
                     if self.__allow_click(x, y, down):
                         self.board[y][x].user_click(button, down)
+            self.game.win = self.check_win()
 
         def __allow_click(self, x, y, down):
             """Hadles the click: cancels it if it is not on the same tile"""
@@ -154,6 +160,21 @@ class Game:
 
 
             return False
+
+        def check_win(self):
+            if self.game.lose:
+                return False
+            for line in self.board:
+                for tile in line:
+                    if not tile.uncovered:
+                        if not tile.hasBomb:
+                            return False
+            for line in self.board:
+                for tile in line:
+                    if tile.hasBomb:
+                        tile.flag = True
+            return True
+
 
         class Tile:
             """Subclass of class 'Board', is used to represent one tile. It can:
@@ -231,6 +252,7 @@ class Game:
                         self.unpress()
                         self.clicked = True
                         if self.hasBomb:
+                            self.game.lose = True
                             for line in self.game.board.board:
                                 for tile in line:
                                     tile.uncovered = True
@@ -252,7 +274,10 @@ class Game:
                     for n in self.neighbours:
                         if not n.flag:
                             n.uncover_neighbours()
-       
+
+            def isCorrect(self):
+                return self.uncovered or self.hasBomb == self.flag
+
             def uncover_neighbours(self):
                 """Uncoveres its neighbours if there are any with a bomb"""
                 self.uncovered = True
