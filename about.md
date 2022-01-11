@@ -2,9 +2,6 @@
 - in corners grid lines sometimes are not rendered to the absolute end
 - grid lines are not positioned perfectly -> tiles are not rendered in
 the middle
-- it ignores the flag -> its only visual indicator
-
-- bad naming of uncovered and covered (sometimes switch up)
 
 ## Features:
 - **Click highlighting and canceling:**

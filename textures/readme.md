@@ -7,4 +7,4 @@
 - *bomb_tile_red.png* -> 15x15 px
 - *flag_tile.png* -> 512x512 px
 - *pressed_tile.png* -> 16x16 px
-- *uncovered_tile.png* -> 512x512 px
+- *covered_tile.png* -> 512x512 px

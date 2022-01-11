@@ -194,7 +194,7 @@ class Game:
                 elif self.pressed:
                     self.__render_texture(screen, textures.pressed_tile, x, y, size)            
                 else:
-                    self.__render_texture(screen, textures.uncovered_tile, x, y, size)
+                    self.__render_texture(screen, textures.covered_tile, x, y, size)
                     
             def __render_uncovered(self, screen, x, y, size):
                 """Renders number of neighbours with bomb or the bomb itself"""

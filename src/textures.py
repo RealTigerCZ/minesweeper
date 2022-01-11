@@ -26,11 +26,11 @@ class Textures:
         self.path = path
 
         # textures
-        self.bomb_tile      = Texture("bomb_tile",      "png", (15, 15), path)
-        self.bomb_tile_red  = Texture("bomb_tile_red",  "png", (15, 15), path)
-        self.flag_tile      = Texture("flag_tile",      "png", (512, 512), path)
-        self.pressed_tile   = Texture("pressed_tile",   "png", (16, 16), path)
-        self.uncovered_tile = Texture("uncovered_tile", "png", (512, 512), path)
+        self.bomb_tile      = Texture("bomb_tile",     "png", (15, 15), path)
+        self.bomb_tile_red  = Texture("bomb_tile_red", "png", (15, 15), path)
+        self.flag_tile      = Texture("flag_tile",     "png", (512, 512), path)
+        self.pressed_tile   = Texture("pressed_tile",  "png", (16, 16), path)
+        self.covered_tile = Texture("covered_tile",  "png", (512, 512), path)
 
         # states
         self.loaded = False
@@ -57,6 +57,6 @@ class Textures:
         self.__load_texture(self.bomb_tile_red)
         self.__load_texture(self.flag_tile)
         self.__load_texture(self.pressed_tile)
-        self.__load_texture(self.uncovered_tile)
+        self.__load_texture(self.covered_tile)
 
         self.loaded = True
