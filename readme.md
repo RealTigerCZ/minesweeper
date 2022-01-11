@@ -21,6 +21,8 @@ python main.py
  **Read [about.md](https://github.com/RealTigerCZ/minesweeper/blob/master/about.md)**
 
  ## Goals:
+ - [x] Click highlighing and canceling
+ - [x] Advanced clicking controls
  - [ ] Gameplay - so you can win and lose
  - [ ] Restart button
  - [ ] Displays - missing bombs, timer, ...

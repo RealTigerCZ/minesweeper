@@ -35,6 +35,7 @@ pygame.display.set_caption("Very bad minesweeper")
 
 while run:
     for event in pygame.event.get():
+        #print(event)
         if event.type == pygame.QUIT:
             run = False
 
@@ -42,8 +43,11 @@ while run:
             w, h = game.board.calc_padding(event.w, event.h)
             screen = pygame.display.set_mode((w, h), pygame.RESIZABLE)
 
+        elif event.type == pygame.MOUSEBUTTONUP:
+            game.board.handle_click(event.pos, event.button, False)
+
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            game.board.handle_click(pygame.mouse.get_pos(), pygame.mouse.get_pressed())
+            game.board.handle_click(event.pos, event.button, True)
 
     screen.fill(colors.background)
     clock.tick(60)
