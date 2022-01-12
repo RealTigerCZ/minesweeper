@@ -52,10 +52,12 @@ while run:
             screen = pygame.display.set_mode((w, h), pygame.RESIZABLE)
 
         elif event.type == pygame.MOUSEBUTTONUP:
-            game.board.handle_click(event.pos, event.button, False)
+            if game.win + game.lose == 0:
+                game.board.handle_click(event.pos, event.button, False)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            game.board.handle_click(event.pos, event.button, True)
+            if game.win + game.lose == 0:
+                game.board.handle_click(event.pos, event.button, True)
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_r:

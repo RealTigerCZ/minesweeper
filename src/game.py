@@ -275,13 +275,15 @@ class Game:
                 if with_flag == self.bombNeighboursCount:
                     for n in self.neighbours:
                         if not n.flag:
+                            if n.hasBomb:
+                                n.user_click(1, False)
+                                break
                             n.uncover_neighbours()
 
-            def isCorrect(self):
-                return self.uncovered or self.hasBomb == self.flag
+
 
             def uncover_neighbours(self):
-                """Uncoveres its neighbours if there are any with a bomb"""
+                """Uncoveres its neighbours if there are none with a bomb"""
                 self.uncovered = True
                 if self.bombNeighboursCount == 0:
                     for n in self.neighbours:

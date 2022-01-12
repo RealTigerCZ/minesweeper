@@ -4,11 +4,14 @@
 the middle
 
 ## Features:
-- **Click highlighting and canceling:**
+- **Click highlighting:**
     - if you press covered tile -> texture will change
     - if you press uncovered tile -> texture of covered neighbours will change
-    - if you press one tile and slide to another -> click will be canceled
-    - if you left click on tile with flag -> click will be canceled
+
+- **Click cancelling:**
+    - when you press one tile and slide to another
+    - when you left click on tile with flag
+    - when game is won or lost 
 
 - **Advanced clicking controls:**
     - left clicking on uncovered tile with number, uncoveres all their neighbours if you mark same number of bombs as are on number
@@ -22,5 +25,5 @@ the middle
 
 
 ## Missing features:
-- gameplay (yea it does not have any gameplay, you cant win or lose, you can only run it, click on tiles ale restart it)
+- gameplay (yea it does not have any gameplay)
 - lots of other thing like settings, proper menu etc.
