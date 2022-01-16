@@ -1,16 +1,16 @@
 from game import *
 
-
 # TESTING
 
-game = Game((16, 8), 16)
+BOARD_SIZE = V2i(16, 8)
+
+game = Game(BOARD_SIZE, 16)
 # print(game.board)
 
 pygame.init()
 DESKTOP_SCREEN = pygame.display.Info()
 
-DESKTOP_W = DESKTOP_SCREEN.current_w
-DESKTOP_H = DESKTOP_SCREEN.current_h
+DESKTOP = Window(DESKTOP_SCREEN.current_w, DESKTOP_SCREEN.current_h)
 
 MIN_TILE_SIZE = 18
 
@@ -18,13 +18,14 @@ MIN_TILE_SIZE = 18
 game.board.sizeTile = 25
 game.board.padding = (3, 25)
 
-MAX_SIZEX = DESKTOP_W // MIN_TILE_SIZE - 1
-MAX_SIZEY = (DESKTOP_H - game.board.padding[1]) // MIN_TILE_SIZE - 3
+MAX_SIZE = V2i()
+MAX_SIZE.x = DESKTOP.w // MIN_TILE_SIZE - 1
+MAX_SIZE.y = (DESKTOP.h - game.board.padding[1]) // MIN_TILE_SIZE - 3
 
-print((MAX_SIZEX, MAX_SIZEY))
+print((MAX_SIZE.x, MAX_SIZE.y))
 
-DEFAULT_WIDTH  = game.board.sizeX * 30 + 5
-DEFAULT_HEIGHT = game.board.sizeY * 30 + game.board.padding[1]
+DEFAULT_WIDTH  = game.board.size.x * 30 + 5
+DEFAULT_HEIGHT = game.board.size.y * 30 + game.board.padding[1]
 
 run = True
 screen = pygame.display.set_mode((DEFAULT_WIDTH, DEFAULT_HEIGHT), pygame.RESIZABLE)

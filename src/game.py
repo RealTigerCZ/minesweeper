@@ -9,7 +9,7 @@ MIN_TILE_SIZE = 18
 
 class Game:
     """The main Game class"""
-    def __init__(self, sizeOfBoard: Tuple[int, int], bombsCount: int):
+    def __init__(self, sizeOfBoard: V2i, bombsCount: int):
         self.board = self.Board(sizeOfBoard, bombsCount, self)
         self.__check()
         self.board.create_board()
@@ -18,15 +18,15 @@ class Game:
         self.lose = False        
 
     def __check(self):
-        """Internal method of class Game which checks internal values like sizeX, sizeY, bombCount"""
-        if self.board.sizeX <= 0:
-            raise SystemExit(f"Cannot have board with sizeX less or equal to 0! Inputed value: {self.sizeX}")
+        """Internal method of class Game which checks internal values like size.x, size.y, bombCount"""
+        if self.board.size.x <= 0:
+            raise SystemExit(f"Cannot have board with size.x less or equal to 0! Inputed value: {self.size.x}")
  
-        if self.board.sizeY <= 0:
-            raise SystemExit(f"Cannot have board with sizeY less or equal to 0! Inputed value: {self.sizeY}")
+        if self.board.size.y <= 0:
+            raise SystemExit(f"Cannot have board with size.y less or equal to 0! Inputed value: {self.size.y}")
 
-        if self.board.bombsCount >= self.board.sizeX * self.board.sizeY:
-            raise SystemExit(f"Cannot have that much bombs! (Cant be equal to size of board or even bigger) Bombs count: {self.bombsCount}, size of borad: {self.sizeX * self.sizeY}")
+        if self.board.bombsCount >= self.board.size.x * self.board.size.y:
+            raise SystemExit(f"Cannot have that much bombs! (Cant be equal to size of board or even bigger) Bombs count: {self.bombsCount}, size of borad: {self.size.x * self.size.y}")
 
 
     def __set_for_render(self, screen):
@@ -35,7 +35,7 @@ class Game:
         #TODO render
 
     def reset(self):
-        size = (self.board.sizeX, self.board.sizeY)
+        size = (self.board.size.x, self.board.size.y)
         bombs = self.board.bombsCount
         padding = self.board.padding
         size_tile = self.board.sizeTile
@@ -59,9 +59,8 @@ class Game:
         - store internal states of board
         """
 
-        def __init__(self,  size, bombsCount: int, game):
-            self.sizeX = size[0]
-            self.sizeY = size[1]
+        def __init__(self,  size: V2i, bombsCount: int, game):
+            self.size = size
             self.bombsCount = bombsCount
             self.game = game #refernce to game class
             self.sizeTile = None
@@ -73,12 +72,12 @@ class Game:
              
         def create_board(self):
             """Internal method of class Game which initialize board and all their Tiles"""
-            self.board = [[self.Tile(x, y, self.game) for x in range(self.sizeX)] for y in range(self.sizeY)]
+            self.board = [[self.Tile(x, y, self.game) for x in range(self.size.x)] for y in range(self.size.y)]
 
             i = 0
             while i < self.bombsCount:
-                x = random.randint(0, self.sizeX - 1)
-                y = random.randint(0, self.sizeY - 1)
+                x = random.randint(0, self.size.x - 1)
+                y = random.randint(0, self.size.y - 1)
                 tile = self.board[y][x]          
                 if not tile.hasBomb:
                     tile.hasBomb = True
@@ -91,14 +90,14 @@ class Game:
 
         def __render_grid(self, screen):
             """Renders the background grid"""
-            for i in range(self.sizeX + 1):
+            for i in range(self.size.x + 1):
                 start_pos = (self.padding[0] + i * self.sizeTile, self.padding[1])
-                end_pos =   (self.padding[0] + i * self.sizeTile, self.padding[1] + self.sizeTile * (self.sizeY))
+                end_pos =   (self.padding[0] + i * self.sizeTile, self.padding[1] + self.sizeTile * (self.size.y))
                 pygame.draw.line(screen, colors.grid_line_color, start_pos, end_pos, width = self.padding[0])
 
-            for i in range(self.sizeY + 1):
+            for i in range(self.size.y + 1):
                 start_pos = (self.padding[0] , self.padding[1] + i * self.sizeTile)
-                end_pos = (self.padding[0] + self.sizeTile * self.sizeX + 1, self.padding[1] + i * self.sizeTile)
+                end_pos = (self.padding[0] + self.sizeTile * self.size.x + 1, self.padding[1] + i * self.sizeTile)
                 pygame.draw.line(screen, colors.grid_line_color, start_pos, end_pos, width = self.padding[0])
 
         def __render_board(self, screen):
@@ -115,8 +114,8 @@ class Game:
         
         def calc_padding(self, w, h) -> Tuple[int, int]:
             """Calculates padding and returnes is to correct the window size"""
-            x = (w - w//128) // (self.sizeX)
-            y = (h - self.padding[1] - 1) // (self.sizeY)
+            x = (w - w//128) // (self.size.x)
+            y = (h - self.padding[1] - 1) // (self.size.y)
             self.sizeTile = min(x, y)
             self.padding = (self.sizeTile // 12, self.padding[1])
             if self.sizeTile < MIN_TILE_SIZE:
@@ -124,12 +123,12 @@ class Game:
                 self.padding = (2, self.padding[1])
 
             
-            return (self.sizeX * self.sizeTile + self.padding[0]*3//2 + 2, self.sizeY * self.sizeTile + self.padding[0]//2 + self.padding[1] + 2)
+            return (self.size.x * self.sizeTile + self.padding[0]*3//2 + 2, self.size.y * self.sizeTile + self.padding[0]//2 + self.padding[1] + 2)
 
         def __pos_in_on_board(self, pos):
             """Returns true if position is on some tile of the board"""
-            if pos[0] >= self.padding[0] and pos[0] < self.padding[0] + self.sizeTile * self.sizeX:
-                if pos[1] >= self.padding[1] and pos[1] < self.padding[1] + self.sizeTile * self.sizeY:
+            if pos[0] >= self.padding[0] and pos[0] < self.padding[0] + self.sizeTile * self.size.x:
+                if pos[1] >= self.padding[1] and pos[1] < self.padding[1] + self.sizeTile * self.size.y:
                     return True
             return False
 
@@ -204,7 +203,7 @@ class Game:
                 for dir in dirs:
                     x = dir[0] + self.x
                     y = dir[1] + self.y
-                    if x < self.game.board.sizeX and x >= 0 and y < self.game.board.sizeY and y >= 0:
+                    if x < self.game.board.size.x and x >= 0 and y < self.game.board.size.y and y >= 0:
                         self.neighbours.append(self.game.board.board[y][x])
 
             def count_bombs(self):
