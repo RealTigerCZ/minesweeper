@@ -35,7 +35,7 @@ class Game:
         #TODO render
 
     def reset(self):
-        size = (self.board.size.x, self.board.size.y)
+        size = V2i(self.board.size.x, self.board.size.y)
         bombs = self.board.bombsCount
         padding = self.board.padding
         size_tile = self.board.sizeTile
