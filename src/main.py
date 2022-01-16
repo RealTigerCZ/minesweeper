@@ -2,6 +2,7 @@ from game import *
 
 
 # TESTING
+
 game = Game((16, 8), 16)
 # print(game.board)
 
@@ -33,6 +34,13 @@ clock = pygame.time.Clock()
 
 pygame.display.set_caption("Very bad minesweeper")
 
+
+# TRACKING FPS
+# fps_font = pygame.font.SysFont("Comic Sans MS", 50)
+# import time
+# start_time = time.time() - 1
+
+frame = 0
 while run:
     for event in pygame.event.get():
         #print(event)
@@ -44,13 +52,33 @@ while run:
             screen = pygame.display.set_mode((w, h), pygame.RESIZABLE)
 
         elif event.type == pygame.MOUSEBUTTONUP:
-            game.board.handle_click(event.pos, event.button, False)
+            if game.win + game.lose == 0:
+                game.board.handle_click(event.pos, event.button, False)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            game.board.handle_click(event.pos, event.button, True)
+            if game.win + game.lose == 0:
+                game.board.handle_click(event.pos, event.button, True)
 
-    screen.fill(colors.background)
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_r:
+                game.reset()
+                frame = 0
+    if game.win:
+        screen.fill(colors.win_colors[frame//60 % 2])
+    elif game.lose:
+        screen.fill(colors.lose_colors[frame//60 % 2])
+    else:
+        screen.fill(colors.background)
+
+
+    # TRACKING FPS
+    # if frame % 30 == 0:
+    #     fps = fps_font.render(str(round(30/(time.time() - start_time), 1)), True, (0,0,255))
+    #     start_time = time.time()
+    #     fpsRect = fps.get_rect()
+    # screen.blit(fps, fpsRect)
+ 
     clock.tick(60)
     game.board.render(screen)
-    #print(screen.get_width(), screen.get_height())
+    frame += 1
     pygame.display.flip()

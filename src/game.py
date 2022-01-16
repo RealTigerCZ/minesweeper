@@ -14,6 +14,8 @@ class Game:
         self.__check()
         self.board.create_board()
 
+        self.win = False
+        self.lose = False        
 
     def __check(self):
         """Internal method of class Game which checks internal values like sizeX, sizeY, bombCount"""
@@ -31,6 +33,20 @@ class Game:
         self.w = screen.get_width()
         self.h = screen.get_height()
         #TODO render
+
+    def reset(self):
+        size = (self.board.sizeX, self.board.sizeY)
+        bombs = self.board.bombsCount
+        padding = self.board.padding
+        size_tile = self.board.sizeTile
+
+        self.board = self.Board(size, bombs, self)
+        self.board.create_board()
+        self.board.padding = padding
+        self.board.sizeTile = size_tile
+
+        self.win = False
+        self.lose = False
 
     def render(self, screen):
         pass
@@ -126,6 +142,7 @@ class Game:
                     
                     if self.__allow_click(x, y, down):
                         self.board[y][x].user_click(button, down)
+            self.game.win = self.check_win()
 
         def __allow_click(self, x, y, down):
             """Hadles the click: cancels it if it is not on the same tile"""
@@ -143,6 +160,21 @@ class Game:
 
 
             return False
+
+        def check_win(self):
+            if self.game.lose:
+                return False
+            for line in self.board:
+                for tile in line:
+                    if not tile.uncovered:
+                        if not tile.hasBomb:
+                            return False
+            for line in self.board:
+                for tile in line:
+                    if tile.hasBomb:
+                        tile.flag = True
+            return True
+
 
         class Tile:
             """Subclass of class 'Board', is used to represent one tile. It can:
@@ -213,6 +245,8 @@ class Game:
             def user_click(self, button: int, down: bool):
                 """Handles user click send by board"""
                 if button == 1:
+                    if self.flag:
+                        return
                     if down:
                         self.pressed = True
                         self.press_num()
@@ -220,6 +254,7 @@ class Game:
                         self.unpress()
                         self.clicked = True
                         if self.hasBomb:
+                            self.game.lose = True
                             for line in self.game.board.board:
                                 for tile in line:
                                     tile.uncovered = True
@@ -240,10 +275,15 @@ class Game:
                 if with_flag == self.bombNeighboursCount:
                     for n in self.neighbours:
                         if not n.flag:
+                            if n.hasBomb:
+                                n.user_click(1, False)
+                                break
                             n.uncover_neighbours()
-       
+
+
+
             def uncover_neighbours(self):
-                """Uncoveres its neighbours if there are any with a bomb"""
+                """Uncoveres its neighbours if there are none with a bomb"""
                 self.uncovered = True
                 if self.bombNeighboursCount == 0:
                     for n in self.neighbours:
