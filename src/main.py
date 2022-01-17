@@ -24,18 +24,18 @@ MIN_TILE_SIZE = 18
 
 
 game.board.sizeTile = 25
-game.board.padding = (X_PADDING, game.smileButton.size.y + Y_PADDING * 2)
+game.board.padding = V2i(X_PADDING, game.smileButton.size.y + Y_PADDING * 2)
 
 
 
 MAX_SIZE = V2i()
 MAX_SIZE.x = DESKTOP.w // MIN_TILE_SIZE - 1
-MAX_SIZE.y = (DESKTOP.h - game.board.padding[1]) // MIN_TILE_SIZE - 3
+MAX_SIZE.y = (DESKTOP.h - game.board.padding.y) // MIN_TILE_SIZE - 3
 
 print((MAX_SIZE.x, MAX_SIZE.y))
 
 DEFAULT_WIDTH  = game.board.size.x * 30 + 5
-DEFAULT_HEIGHT = game.board.size.y * 30 + game.board.padding[1]
+DEFAULT_HEIGHT = game.board.size.y * 30 + game.board.padding.y
 
 
 sz = min(DEFAULT_WIDTH, DEFAULT_HEIGHT) // 8
@@ -58,7 +58,6 @@ pygame.display.set_caption("Very bad minesweeper")
 # import time
 # start_time = time.time() - 1
 
-frame = 0
 while run:
     for event in pygame.event.get():
         #print(event)
@@ -70,21 +69,19 @@ while run:
             screen = pygame.display.set_mode((w, h), pygame.RESIZABLE)
 
         elif event.type == pygame.MOUSEBUTTONUP:
-            if game.win + game.lose == 0:
-                game.board.handle_click(event.pos, event.button, False)
+            game.handle_click(V2i(event.pos[0], event.pos[1]), event.button, False)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if game.win + game.lose == 0:
-                game.board.handle_click(event.pos, event.button, True)
+            game.handle_click(V2i(event.pos[0], event.pos[1]) , event.button, True)
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_r:
                 game.reset()
                 frame = 0
-    if game.win:
-        screen.fill(colors.win_colors[frame//60 % 2])
-    elif game.lose:
-        screen.fill(colors.lose_colors[frame//60 % 2])
+    if game.won:
+        screen.fill(colors.win_colors[game.frame//60 % 2])
+    elif game.lost:
+        screen.fill(colors.lose_colors[game.frame//60 % 2])
     else:
         screen.fill(colors.background)
 
@@ -98,5 +95,5 @@ while run:
  
     clock.tick(60)
     game.render(screen)
-    frame += 1
+    game.frame += 1
     pygame.display.flip()

@@ -18,8 +18,10 @@ class Game:
 
         self.smileButton.gameInit(self)
 
-        self.win = False
-        self.lose = False        
+        self.won = False
+        self.lost = False
+
+        self.frame = 0        
 
     def __check(self):
         """Internal method of class Game which checks internal values like size.x, size.y, bombCount"""
@@ -32,6 +34,15 @@ class Game:
         if self.board.bombsCount >= self.board.size.x * self.board.size.y:
             raise SystemExit(f"Cannot have that much bombs! (Cant be equal to size of board or even bigger) Bombs count: {self.bombsCount}, size of borad: {self.size.x * self.size.y}")
 
+    def lose(self):
+        self.smileButton.updateState(3)
+        self.lost = True
+        self.frame = 0
+
+    def win(self):
+        self.smileButton.updateState(2)
+        self.won = True
+        self.frame = 0
 
     def __set_for_render(self, screen):
         self.w = screen.get_width()
@@ -49,8 +60,10 @@ class Game:
         self.board.padding = padding
         self.board.sizeTile = size_tile
 
-        self.win = False
-        self.lose = False
+        self.smileButton.updateState(0)
+        self.won = False
+        self.lost = False
+        self.frame = 0
 
     def render(self, screen):
         self.smileButton.render(screen)
@@ -61,6 +74,13 @@ class Game:
         w, h = self.board.calc_padding(w, h)
         self.smileButton.resize(w, h)
         return w, h
+
+    def handle_click(self, pos: V2i, button: int, down: bool):
+        self.smileButton.handle_click(pos, button)
+        if self.won + self.lost == 0:
+            if button in [1, 3]:
+                self.smileButton.updateState(0 + down)
+                self.board.handle_click(pos, button, down)
 
 
     class Board:
@@ -102,14 +122,14 @@ class Game:
         def __render_grid(self, screen):
             """Renders the background grid"""
             for i in range(self.size.x + 1):
-                start_pos = (self.padding[0] + i * self.sizeTile, self.padding[1])
-                end_pos =   (self.padding[0] + i * self.sizeTile, self.padding[1] + self.sizeTile * (self.size.y))
-                pygame.draw.line(screen, colors.grid_line_color, start_pos, end_pos, width = self.padding[0])
+                start_pos = (self.padding.x + i * self.sizeTile, self.padding.y)
+                end_pos =   (self.padding.x + i * self.sizeTile, self.padding.y + self.sizeTile * (self.size.y))
+                pygame.draw.line(screen, colors.grid_line_color, start_pos, end_pos, width = self.padding.x)
 
             for i in range(self.size.y + 1):
-                start_pos = (self.padding[0] , self.padding[1] + i * self.sizeTile)
-                end_pos = (self.padding[0] + self.sizeTile * self.size.x + 1, self.padding[1] + i * self.sizeTile)
-                pygame.draw.line(screen, colors.grid_line_color, start_pos, end_pos, width = self.padding[0])
+                start_pos = (self.padding.x , self.padding.y + i * self.sizeTile)
+                end_pos = (self.padding.x + self.sizeTile * self.size.x + 1, self.padding.y + i * self.sizeTile)
+                pygame.draw.line(screen, colors.grid_line_color, start_pos, end_pos, width = self.padding.x)
 
         def __render_board(self, screen):
             """Render the tiles of the board"""
@@ -126,33 +146,34 @@ class Game:
         def calc_padding(self, w, h) -> Tuple[int, int]:
             """Calculates padding and returnes is to correct the window size"""
             x = (w - w//128) // (self.size.x)
-            y = (h - self.padding[1] - 1) // (self.size.y)
+            y = (h - self.padding.y - 1) // (self.size.y)
             self.sizeTile = min(x, y)
-            self.padding = (self.sizeTile // 12,6 + min(w, h) // 5)
+            self.padding.y = 6 + min(w, h) // 5
+            self.padding.x = self.sizeTile // 12
             if self.sizeTile < MIN_TILE_SIZE:
                 self.sizeTile = MIN_TILE_SIZE
-                self.padding = (2, 6 + min(w, h) // 5)
+                self.padding.x = 2
 
             
-            return (self.size.x * self.sizeTile + self.padding[0]*3//2 + 2, self.size.y * self.sizeTile + self.padding[0]//2 + self.padding[1] + 2)
+            return (self.size.x * self.sizeTile + self.padding.x*3//2 + 2, self.size.y * self.sizeTile + self.padding.x//2 + self.padding.y + 2)
 
-        def __pos_in_on_board(self, pos):
+        def __pos_in_on_board(self, pos: V2i):
             """Returns true if position is on some tile of the board"""
-            if pos[0] >= self.padding[0] and pos[0] < self.padding[0] + self.sizeTile * self.size.x:
-                if pos[1] >= self.padding[1] and pos[1] < self.padding[1] + self.sizeTile * self.size.y:
+            if pos.x >= self.padding.x and pos.x < self.padding.x + self.sizeTile * self.size.x:
+                if pos.y >= self.padding.y and pos.y < self.padding.y + self.sizeTile * self.size.y:
                     return True
             return False
 
-        def handle_click(self, pos: Tuple[int, int], button: int, down: bool):
+        def handle_click(self, pos: V2i, button: int, down: bool):
             """Haddles the click from user and passes it ot correct tile"""
             if button in [1, 3]: #ignores button 2 -> midlle click
                 if self.__pos_in_on_board(pos):
-                    x = (pos[0] - self.padding[0]) // self.sizeTile
-                    y = (pos[1] - self.padding[1]) // self.sizeTile
+                    x = (pos.x - self.padding.x) // self.sizeTile
+                    y = (pos.y - self.padding.y) // self.sizeTile
                     
                     if self.__allow_click(x, y, down):
                         self.board[y][x].user_click(button, down)
-            self.game.win = self.check_win()
+            self.check_win()
 
         def __allow_click(self, x, y, down):
             """Hadles the click: cancels it if it is not on the same tile"""
@@ -172,18 +193,19 @@ class Game:
             return False
 
         def check_win(self):
-            if self.game.lose:
+            if self.game.lost:
                 return False
             for line in self.board:
                 for tile in line:
                     if not tile.uncovered:
                         if not tile.hasBomb:
-                            return False
+                            return 
             for line in self.board:
                 for tile in line:
                     if tile.hasBomb:
                         tile.flag = True
-            return True
+            self.game.win()
+
 
 
         class Tile:
@@ -226,8 +248,8 @@ class Game:
 
             def render(self, screen, padding: int, size: int):
                 """Renders itself to correct position with correct texture"""
-                x = padding[0] + self.x * size
-                y = padding[1] + self.y * size
+                x = padding.x + self.x * size
+                y = padding.y + self.y * size
 
                 if self.uncovered:
                     self.__render_uncovered(screen, x, y, size)
@@ -264,7 +286,7 @@ class Game:
                         self.unpress()
                         self.clicked = True
                         if self.hasBomb:
-                            self.game.lose = True
+                            self.game.lose()
                             for line in self.game.board.board:
                                 for tile in line:
                                     tile.uncovered = True

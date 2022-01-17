@@ -33,6 +33,7 @@ class SmileButton(Button):
         self.initialized = True
 
     def __action(self):
+        assert self.initialized, "Button not initialized with game"
         self.__game.reset()
 
     def updateState(self, state: int):
@@ -51,3 +52,8 @@ class SmileButton(Button):
         self.pos.x = w//2 - self.size.x // 2
         print(self.pos)
         self.pos2 = self.pos + self.size
+
+    def handle_click(self, pos: V2i, pressed: int):
+        if pressed == 1:
+            if self.posOnButton(pos):
+                self.__action()
