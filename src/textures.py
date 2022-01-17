@@ -1,5 +1,5 @@
 from typing import Tuple
-from dataclasses import dataclass
+from wrappers import *
 import os, pygame
 
 
@@ -32,6 +32,13 @@ class Textures:
         self.pressed_tile   = Texture("pressed_tile",  "png", (16, 16), path)
         self.covered_tile = Texture("covered_tile",  "png", (512, 512), path)
 
+        self.smiles = [
+            Texture("smile1", "png", (26, 26), path),
+            Texture("smile2", "png", (26, 26), path),
+            Texture("smile3", "png", (26, 26), path),
+            Texture("smile4", "png", (26, 26), path)
+        ]
+
         # states
         self.loaded = False
 
@@ -58,5 +65,8 @@ class Textures:
         self.__load_texture(self.flag_tile)
         self.__load_texture(self.pressed_tile)
         self.__load_texture(self.covered_tile)
+
+        for smile in self.smiles:
+            self.__load_texture(smile)
 
         self.loaded = True

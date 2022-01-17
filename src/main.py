@@ -1,34 +1,52 @@
 from game import *
 
-
 # TESTING
 
-game = Game((16, 8), 16)
-# print(game.board)
+Y_PADDING = 3
+X_PADDING = 3
+
+BOARD_SIZE = V2i(16, 8)
 
 pygame.init()
 DESKTOP_SCREEN = pygame.display.Info()
 
-DESKTOP_W = DESKTOP_SCREEN.current_w
-DESKTOP_H = DESKTOP_SCREEN.current_h
+DESKTOP = Window(DESKTOP_SCREEN.current_w, DESKTOP_SCREEN.current_h)
+
+SMILE_BUTTON_SIZE = 26
+
+game = Game(BOARD_SIZE, 16, SmileButton(V2i(50, 3),
+            V2i(SMILE_BUTTON_SIZE, SMILE_BUTTON_SIZE)))
+# print(game.board)
+
+
 
 MIN_TILE_SIZE = 18
 
 
 game.board.sizeTile = 25
-game.board.padding = (3, 25)
+game.board.padding = V2i(X_PADDING, game.smileButton.size.y + Y_PADDING * 2)
 
-MAX_SIZEX = DESKTOP_W // MIN_TILE_SIZE - 1
-MAX_SIZEY = (DESKTOP_H - game.board.padding[1]) // MIN_TILE_SIZE - 3
 
-print((MAX_SIZEX, MAX_SIZEY))
 
-DEFAULT_WIDTH  = game.board.sizeX * 30 + 5
-DEFAULT_HEIGHT = game.board.sizeY * 30 + game.board.padding[1]
+MAX_SIZE = V2i()
+MAX_SIZE.x = DESKTOP.w // MIN_TILE_SIZE - 1
+MAX_SIZE.y = (DESKTOP.h - game.board.padding.y) // MIN_TILE_SIZE - 3
+
+print((MAX_SIZE.x, MAX_SIZE.y))
+
+DEFAULT_WIDTH  = game.board.size.x * 30 + 5
+DEFAULT_HEIGHT = game.board.size.y * 30 + game.board.padding.y
+
+
+sz = min(DEFAULT_WIDTH, DEFAULT_HEIGHT) // 8
+
+game.smileButton.size = V2i(sz, sz)
+game.smileButton.pos.x = DEFAULT_WIDTH // 2 - game.smileButton.size.x // 2
+game.smileButton.pos.y = Y_PADDING
 
 run = True
 screen = pygame.display.set_mode((DEFAULT_WIDTH, DEFAULT_HEIGHT), pygame.RESIZABLE)
-w, h = game.board.calc_padding(DEFAULT_WIDTH, DEFAULT_HEIGHT)
+w, h = game.resize(DEFAULT_WIDTH, DEFAULT_HEIGHT)
 screen = pygame.display.set_mode((w, h), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 
@@ -40,7 +58,6 @@ pygame.display.set_caption("Very bad minesweeper")
 # import time
 # start_time = time.time() - 1
 
-frame = 0
 while run:
     for event in pygame.event.get():
         #print(event)
@@ -48,25 +65,23 @@ while run:
             run = False
 
         elif event.type == pygame.VIDEORESIZE:
-            w, h = game.board.calc_padding(event.w, event.h)
+            w, h = game.resize(event.w, event.h)
             screen = pygame.display.set_mode((w, h), pygame.RESIZABLE)
 
         elif event.type == pygame.MOUSEBUTTONUP:
-            if game.win + game.lose == 0:
-                game.board.handle_click(event.pos, event.button, False)
+            game.handle_click(V2i(event.pos[0], event.pos[1]), event.button, False)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if game.win + game.lose == 0:
-                game.board.handle_click(event.pos, event.button, True)
+            game.handle_click(V2i(event.pos[0], event.pos[1]) , event.button, True)
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_r:
                 game.reset()
                 frame = 0
-    if game.win:
-        screen.fill(colors.win_colors[frame//60 % 2])
-    elif game.lose:
-        screen.fill(colors.lose_colors[frame//60 % 2])
+    if game.won:
+        screen.fill(colors.win_colors[game.frame//60 % 2])
+    elif game.lost:
+        screen.fill(colors.lose_colors[game.frame//60 % 2])
     else:
         screen.fill(colors.background)
 
@@ -79,6 +94,6 @@ while run:
     # screen.blit(fps, fpsRect)
  
     clock.tick(60)
-    game.board.render(screen)
-    frame += 1
+    game.render(screen)
+    game.frame += 1
     pygame.display.flip()

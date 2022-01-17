@@ -23,9 +23,9 @@ python main.py
  ## Goals:
  - [x] Click highlighing and canceling
  - [x] Advanced clicking controls
- - [ ] Gameplay - so you can win and lose
- - [ ] Restart button
+ - [x] Gameplay - so you can win and lose (in some sence)
+ - [x] Restart button (in some sence)
+ - [ ] Actual game loop
  - [ ] Displays - missing bombs, timer, ...
  - [ ] Menu and 'Welcome screen'
  - [ ] Settings
-

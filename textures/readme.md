@@ -8,3 +8,7 @@
 - *flag_tile.png* -> 512x512 px
 - *pressed_tile.png* -> 16x16 px
 - *covered_tile.png* -> 512x512 px
+- *smile1.png* -> 26x26 px
+- *smile2.png* -> 26x26 px
+- *smile4.png* -> 26x26 px
+- *smile3.png* -> 26x26 px
