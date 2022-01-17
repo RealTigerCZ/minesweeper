@@ -1,18 +1,22 @@
-from textures import *
+from button import *
 import random, colors
 
-textures = Textures(os.path.join(os.path.dirname(__file__), "../textures"))
-textures.load_textures()
+
+
 
 MIN_TILE_SIZE = 18
 
 
 class Game:
     """The main Game class"""
-    def __init__(self, sizeOfBoard: V2i, bombsCount: int):
+
+    def __init__(self, sizeOfBoard: V2i, bombsCount: int, smileButton: SmileButton):
         self.board = self.Board(sizeOfBoard, bombsCount, self)
         self.__check()
         self.board.create_board()
+        self.smileButton = smileButton
+
+        self.smileButton.gameInit(self)
 
         self.win = False
         self.lose = False        
@@ -49,8 +53,15 @@ class Game:
         self.lose = False
 
     def render(self, screen):
-        pass
+        self.smileButton.render(screen)
+        self.board.render(screen)
         #TODO render
+
+    def resize(self, w, h) -> Tuple[int, int]:
+        w, h = self.board.calc_padding(w, h)
+        self.smileButton.resize(w, h)
+        return w, h
+
 
     class Board:
         """Subclass of class 'Game', is used to represent board. It can:
@@ -117,10 +128,10 @@ class Game:
             x = (w - w//128) // (self.size.x)
             y = (h - self.padding[1] - 1) // (self.size.y)
             self.sizeTile = min(x, y)
-            self.padding = (self.sizeTile // 12, self.padding[1])
+            self.padding = (self.sizeTile // 12,6 + min(w, h) // 5)
             if self.sizeTile < MIN_TILE_SIZE:
                 self.sizeTile = MIN_TILE_SIZE
-                self.padding = (2, self.padding[1])
+                self.padding = (2, 6 + min(w, h) // 5)
 
             
             return (self.size.x * self.sizeTile + self.padding[0]*3//2 + 2, self.size.y * self.sizeTile + self.padding[0]//2 + self.padding[1] + 2)
