@@ -71,12 +71,14 @@ class Game:
         #TODO render
 
     def resize(self, w, h) -> Tuple[int, int]:
+        """Handles window resizing"""
         w, h = self.board.calc_padding(w, h)
         self.smileButton.resize(w, h)
         return w, h
 
     def handle_click(self, pos: V2i, button: int, down: bool):
-        self.smileButton.handle_click(pos, button)
+        """Handles click from user -> redirect it to smile button or game.board"""
+        self.smileButton.handle_click(pos, button, down)
         if self.won + self.lost == 0:
             if button in [1, 3]:
                 self.smileButton.updateState(0 + down)
@@ -85,9 +87,9 @@ class Game:
 
     class Board:
         """Subclass of class 'Game', is used to represent board. It can:
-        - render itself
-        - handle click from user
-        - store internal states of board
+        - renders itself, calculates its position
+        - handles click from user
+        - stores internal states of board
         """
 
         def __init__(self,  size: V2i, bombsCount: int, game):
