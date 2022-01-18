@@ -37,4 +37,4 @@ the middle
 
 ## Missing features:
 - gameloop
-- lots of other thing like settings, proper menu etc. see [Goals](https://github.com/RealTigerCZ/minesweeper/blob/master/readme.md)
+- lots of other thing like settings, proper menu etc. see [Goals](https://github.com/RealTigerCZ/minesweeper/blob/master/readme.md#goals)

@@ -1,6 +1,5 @@
 from button import *
-import random, colors
-
+import random
 
 
 

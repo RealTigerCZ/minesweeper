@@ -1,6 +1,6 @@
 from typing import Tuple
-from wrappers import *
-import os, pygame
+from seven_segment import *
+import os
 
 
 @dataclass
