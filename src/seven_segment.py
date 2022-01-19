@@ -1,6 +1,8 @@
+from turtle import width
 from wrappers import *
 import colors
 import pygame
+import time
 
 class SevenSegment():
     def __init__(self, pos: V2i, width: int, height: int, thickness: int):
@@ -9,7 +11,7 @@ class SevenSegment():
         self.width = width
         self.thickness = thickness
         self.__create_tiles()
-        self.state = 3
+        self.state = 0
         """LAYOUT
         #     --     F               
         #    |  |  E   A
@@ -58,7 +60,7 @@ class SevenSegment():
 
 
     def reset(self):
-        pass
+        self.state = 0
 
     def render(self, screen):
         pygame.draw.rect(screen, colors.seven_segment_background, (self.pos.x, self.pos.y, self.width, self.height))
@@ -79,3 +81,65 @@ class SevenSegment():
         def render(self, screen, active):
             c = colors.seven_segment_light if active else colors.seven_segment_dark
             pygame.draw.rect(screen, c, (self.pos.x, self.pos.y, self.w, self.h))
+
+class SevenSegmentDisplay():
+    def __init__(self, pos: V2i, width: int, height: int, thickness: int, segmentCount: int):
+        self.segmentCount = segmentCount
+        self.segments = [SevenSegment(pos + V2i(width * i, 0), width, height, thickness) for i in range(segmentCount)]
+        self.__state = 0
+
+    def render(self, screen):
+        for s in self.segments:
+            s.render(screen)
+
+    def updateState(self, state):
+        self.__state = state
+        for idx, s in enumerate(reversed(self.segments)):
+            s.state = state % 10
+            state = state // 10
+    
+    def updateStateBy(self, inc):
+        self.updateState(self.__state + inc)
+
+
+class SevenSegmentTime():
+    def __init__(self, pos: V2i, width: int, height: int, thickness: int):
+        self.minuteSegment = SevenSegmentDisplay(pos, width, height, thickness, 2)
+        self.secondSegment = SevenSegmentDisplay(pos + V2i(width * 2 + thickness * 3, 0), width, height, thickness, 2)
+
+        self.pos = pos
+        self.width = width
+        self.height = height
+        self.thickness = thickness
+
+        self.start_time = time.time()
+
+    def render(self, screen):
+        t = time.time() - self.start_time
+        self.__render_dots(screen, (t * 10) % 10 < 5)
+        t = round(t)
+
+        self.secondSegment.updateState(t%60)
+        self.minuteSegment.updateState(t // 60)
+
+        self.secondSegment.render(screen)
+        self.minuteSegment.render(screen)
+
+        
+    
+    def __render_dots(self, screen, active):
+        c = colors.seven_segment_light if active else colors.seven_segment_dark
+        
+        pygame.draw.rect(screen, colors.seven_segment_background,
+        pygame.Rect(self.pos.x + self.width * 2, self.pos.y, self.thickness * 3, self.height))
+        
+        dot = pygame.Rect(0, 0, self.thickness, self.thickness)
+        dot.x = self.pos.x + self.width * 2 + self.thickness
+        dot.y = self.pos.y + self.height // 3 - self.thickness // 2
+        pygame.draw.rect(screen, c, dot)
+
+        dot.y = self.pos.y + self.height - self.height // 3 - self.thickness // 2
+        pygame.draw.rect(screen, c, dot)
+
+    def reset(self):
+        self.start_time = time.time()

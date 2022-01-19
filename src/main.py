@@ -58,8 +58,9 @@ pygame.display.set_caption("Very bad minesweeper")
 # import time
 # start_time = time.time() - 1
 
-segm = SevenSegment(V2i(10, 10), 180, 320, 20)
+segm = SevenSegmentDisplay(V2i(10, 10), 100, 200, 10, 3)
 
+time_display = SevenSegmentTime(V2i(320, 10), 100, 200, 10)
 
 while run:
     for event in pygame.event.get():
@@ -75,8 +76,7 @@ while run:
             game.handle_click(V2i(event.pos[0], event.pos[1]), event.button, False)
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            segm.state += 1
-            segm.state = segm.state % 10
+            segm.updateStateBy(1)
             game.handle_click(V2i(event.pos[0], event.pos[1]) , event.button, True)
 
         elif event.type == pygame.KEYUP:
@@ -102,6 +102,7 @@ while run:
 
     clock.tick(60)
     segm.render(screen)
+    time_display.render(screen)
     #game.render(screen)
     game.frame += 1
     pygame.display.flip()
